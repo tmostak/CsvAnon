@@ -1,8 +1,13 @@
-#include "CsvParser.h"
+#include "CsvProcessor.h"
 #include <iostream>
 
 int main () {
 
-    CsvParser("allahabad_sample_cdr.csv", "allahabad_out.csv", ',', true);
+    try {
+        CsvProcessor("allahabad_sample_cdr.csv", "allahabad_out.csv", ',', true);
+    }
+    catch (Exception e) {
+        cout << "Error: " << e.errorString << endl;
+    }
 }
 
