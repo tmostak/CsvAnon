@@ -1,9 +1,10 @@
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
+#include <string>
 #include <iostream>
 #include "CsvProcessor.h"
 
-CsvProcessor::CsvProcessor(const string &_inFileName, const string &_outFileName, const char _delim, bool _hasHeader): inFileName(_inFileName), outFileName(_outFileName), delim(_delim), hasHeader(_hasHeader), delims("\n") {
+CsvProcessor::CsvProcessor(const string &_inFileName, const string &_outFileName, const char _delim, bool _hasHeader, Hash &_hash): inFileName(_inFileName), outFileName(_outFileName), delim(_delim), hasHeader(_hasHeader), delims(""), hash(_hash) {
     delims += delim; 
     inFile.open(inFileName.c_str());
     if (!inFile.good())
@@ -32,16 +33,24 @@ void CsvProcessor::writeOutput() {
         cout << line << endl;
         vector <string> tokens;
         splitLine(line, tokens);
-        if (lineNum != 0 || !hasHeader)  {
-            for (set<size_t>::iterator scrambleIt = scrambleCols.begin(); scrambleIt != scrambleCols.end(); ++scrambleIt)
-                tokens[*scrambleIt] = *scrambleIt; 
+        if (tokens.size() > 1) {
+            if (lineNum != 0 || !hasHeader)  {
+                for (set<size_t>::iterator scrambleIt = scrambleCols.begin(); scrambleIt != scrambleCols.end(); ++scrambleIt) {
+                    cout << "Scramble: " << *scrambleIt;
+                    cout << "token: " << tokens[*scrambleIt] << endl;
+                    hash(tokens[*scrambleIt]);
+                    cout << tokens[*scrambleIt] << endl;
+                    //tokens[*scrambleIt] = *scrambleIt; 
+                }
+            }
+            for (vector<string>::iterator tokenIt = tokens.begin(); tokenIt != tokens.end(); ++tokenIt) {
+                outFile << *tokenIt;
+                if (tokenIt+1 != tokens.end()) 
+                    outFile << delim;
+            }
+            outFile << endl;
+            lineNum++;
         }
-        for (vector<string>::iterator tokenIt = tokens.begin(); tokenIt != tokens.end(); ++tokenIt) {
-            outFile << *tokenIt;
-            if (tokenIt+1 != tokens.end()) 
-                outFile << delim;
-        }
-        outFile << endl;
     }
     outFile.close();
 }
