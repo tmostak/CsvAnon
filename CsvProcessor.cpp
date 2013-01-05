@@ -22,7 +22,7 @@ CsvProcessor::~CsvProcessor() {
 
 void CsvProcessor::writeOutput() {
     inFile.seekg(0, ios::beg);
-    cout << outFileName << endl;
+    //cout << outFileName << endl;
     outFile.open(outFileName.c_str());
     if (!outFile.is_open())
         throw Exception("Error opening file for writing");
@@ -30,14 +30,14 @@ void CsvProcessor::writeOutput() {
     while (inFile.good()) {
         string line;
         getline(inFile, line);
-        cout << line << endl;
+        //cout << line << endl;
         vector <string> tokens;
         splitLine(line, tokens);
         if (tokens.size() > 1) {
             if (lineNum != 0 || !hasHeader)  {
                 for (set<size_t>::iterator scrambleIt = scrambleCols.begin(); scrambleIt != scrambleCols.end(); ++scrambleIt) {
-                    cout << "Scramble: " << *scrambleIt;
-                    cout << "token: " << tokens[*scrambleIt] << endl;
+                    //cout << "Scramble: " << *scrambleIt;
+                    //cout << "token: " << tokens[*scrambleIt] << endl;
                     hash(tokens[*scrambleIt]);
                     cout << tokens[*scrambleIt] << endl;
                     //tokens[*scrambleIt] = *scrambleIt; 

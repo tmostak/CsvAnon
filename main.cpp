@@ -6,7 +6,7 @@
 int main () {
 
     try {
-        Hash hash(HASH_SHA256);
+        Hash hash(HASH_SHA1);
         CsvProcessor csvProcessor ("allahabad_sample_cdr.csv", "allahabad_out.csv", ',', true, hash);
         vector <string> scrambledCols;
         //scrambledCols.push_back("IMSI");
