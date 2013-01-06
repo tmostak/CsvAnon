@@ -39,7 +39,7 @@ void CsvProcessor::writeOutput() {
                     //cout << "Scramble: " << *scrambleIt;
                     //cout << "token: " << tokens[*scrambleIt] << endl;
                     hash(tokens[*scrambleIt]);
-                    cout << tokens[*scrambleIt] << endl;
+                    //cout << tokens[*scrambleIt] << endl;
                     //tokens[*scrambleIt] = *scrambleIt; 
                 }
             }

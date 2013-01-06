@@ -2,9 +2,42 @@
 #include <iostream>
 #include "Hash.h"
 #include <boost/bind.hpp>
+#include <unistd.h>
 
-int main () {
+using namespace std;
 
+struct Args {
+    string inFileName; 
+    string outFileName;
+    bool hasHeader;
+    char delim;
+    HashType hashType;
+};
+
+void parseArguments(int argc, char* argv[], Args &args) { 
+    int c;
+    int digit_optind = 0;
+    int shaOpt = 0;
+    int headerOpt = 0;
+
+}
+
+
+
+void printUsage (const string &programName) {
+    cerr << "Usage: " << programName << " IN_FILE OUT_FILE" << endl;     
+}
+
+int main (int argc, char* argv[]) {
+    Args args;
+    parseArguments(argc, argv, args); 
+    cout << argc << endl;
+
+    if (argc < 3) {
+        printUsage(argv[0]);
+        return 1;
+    }
+    
     try {
         Hash hash(HASH_SHA1);
         CsvProcessor csvProcessor ("allahabad_sample_cdr.csv", "allahabad_out.csv", ',', true, hash);
@@ -15,7 +48,8 @@ int main () {
         csvProcessor.writeOutput();
     }
     catch (Exception e) {
-        cout << "Error: " << e.errorString << endl;
+        cerr << "Error: " << e.errorString << endl;
+        return 2;
     }
 }
 
