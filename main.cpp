@@ -1,19 +1,33 @@
 #include "CsvProcessor.h"
 #include <iostream>
+#include <string>
 #include "Hash.h"
 #include <boost/bind.hpp>
 #include <unistd.h>
+#include "boost/program_options.hpp"
 
 using namespace std;
 
 struct Args {
-    string inFileName; 
-    string outFileName;
+    string source; 
+    string dest;
     bool hasHeader;
     char delim;
     HashType hashType;
+
+    Args(): hasHeader(false), delim(','), hashType(HASH_SHA1) {}
+
+
 };
 
+namespace { 
+    const size_t ERROR_IN_COMMAND_LINE = 1; 
+    const size_t SUCCESS = 0; 
+    const size_t ERROR_UNHANDLED_EXCEPTION = 2; 
+       
+} // namespace 
+
+/*
 void parseArguments(int argc, char* argv[], Args &args) { 
     int c;
     int digit_optind = 0;
@@ -21,14 +35,59 @@ void parseArguments(int argc, char* argv[], Args &args) {
     int headerOpt = 0;
 
 }
-
-
+*/
 
 void printUsage (const string &programName) {
-    cerr << "Usage: " << programName << " IN_FILE OUT_FILE" << endl;     
+    cerr << "Usage: " << programName << " [OPTION]... SOURCE DEST" << endl;    
 }
 
-int main (int argc, char* argv[]) {
+size_t parseArguments(int argc, char* argv[], Args &args) { 
+    string hashTypeString;
+    namespace po = boost::program_options;
+    po::options_description desc("Options");
+    desc.add_options()
+    ("help,h", "Print help message")
+    ("hash,H", po::value<std::string>(&hashTypeString), "Specify hash type (sha1 [DEFAULT], sha256 or sha512)");
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+
+        if (vm.count("help") ) {
+            printUsage(argv[0]);
+            cout << desc << endl;
+        }
+        else {
+            if (vm.count("hash") )  {
+                cout << "hash found" << endl;
+                cout << hashTypeString << endl;
+            }
+        }
+
+            
+    }
+    catch (po::error &error) {
+        cerr << "Error: " << error.what() << endl << endl;
+        printUsage(argv[0]);
+        cerr << desc << endl;
+        return ERROR_IN_COMMAND_LINE; 
+    }
+    cout << hashTypeString << endl;
+}
+
+
+
+int main (int argc, char * argv[]) {
+    Args args;
+    size_t result = parseArguments(argc, argv, args);
+    if (result != 0)
+        return result;
+
+    //catch (Exception &e) {}
+}
+
+
+
+    /*
     Args args;
     parseArguments(argc, argv, args); 
     cout << argc << endl;
@@ -52,4 +111,5 @@ int main (int argc, char* argv[]) {
         return 2;
     }
 }
+*/
 
