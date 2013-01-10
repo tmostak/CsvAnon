@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include "CsvProcessor.h"
+//#include <boost/lexical_cast.hpp>
+
+
 
 CsvProcessor::CsvProcessor(const string &_inFileName, const string &_outFileName, const char _delim, bool _hasHeader, Hash &_hash): inFileName(_inFileName), outFileName(_outFileName), delim(_delim), hasHeader(_hasHeader), delims(""), hash(_hash) {
     delims += delim; 
@@ -35,12 +38,9 @@ void CsvProcessor::writeOutput() {
         splitLine(line, tokens);
         if (tokens.size() > 1) {
             if (lineNum != 0 || !hasHeader)  {
-                for (set<size_t>::iterator scrambleIt = scrambleCols.begin(); scrambleIt != scrambleCols.end(); ++scrambleIt) {
-                    //cout << "Scramble: " << *scrambleIt;
-                    //cout << "token: " << tokens[*scrambleIt] << endl;
-                    hash(tokens[*scrambleIt]);
-                    //cout << tokens[*scrambleIt] << endl;
-                    //tokens[*scrambleIt] = *scrambleIt; 
+                for (set<size_t>::iterator scrambleIt = scrambledCols.begin(); scrambleIt != scrambledCols.end(); ++scrambleIt) {
+                    if (tokens[*scrambleIt] != "")
+                        hash(tokens[*scrambleIt]);
                 }
             }
             for (vector<string>::iterator tokenIt = tokens.begin(); tokenIt != tokens.end(); ++tokenIt) {
@@ -77,18 +77,18 @@ void CsvProcessor::readHeaders() {
      
     string headerLine;
     getline(inFile, headerLine);
-    cout << headerLine << endl;
+    //cout << headerLine << endl;
     splitLine(headerLine, columnNames);
     numCols = columnNames.size();
-    cout << "Num Cols: " << numCols << endl;
-    for (int i = 0; i != numCols; i++)
-        cout << i << " " << columnNames[i] << endl;
+    //cout << "Num Cols: " << numCols << endl;
+    //for (int i = 0; i != numCols; i++)
+        //cout << i << " " << columnNames[i] << endl;
 }
     
 
-void CsvProcessor::setScrambledColumns(const vector<string> &scrambledColumns) {
-    scrambleCols.clear();
-    for (vector<string>::const_iterator colIt = scrambledColumns.begin(); colIt != scrambledColumns.end(); ++colIt) {
+void CsvProcessor::setScrambledColumnNames(const vector<string> &scrambledColumnNames) {
+    scrambledCols.clear();
+    for (vector<string>::const_iterator colIt = scrambledColumnNames.begin(); colIt != scrambledColumnNames.end(); ++colIt) {
         vector<string>::iterator findIt = find(columnNames.begin(), columnNames.end(), *colIt);
         if (findIt == columnNames.end()) {
             string errorString ("Column " + *colIt + " does not exist.");
@@ -96,12 +96,39 @@ void CsvProcessor::setScrambledColumns(const vector<string> &scrambledColumns) {
         }
         else {
             size_t colIndex = findIt - columnNames.begin();
-            scrambleCols.insert(colIndex);
+            scrambledCols.insert(colIndex);
         }
     }
 }
 
 
+void CsvProcessor::setScrambledColumnNums(const vector<size_t> &scrambledColumnNums) {
+    scrambledCols.clear();
+    size_t minElem = *min_element(scrambledColumnNums.begin(), scrambledColumnNums.end());
+    size_t maxElem = *max_element(scrambledColumnNums.begin(), scrambledColumnNums.end());
+    if (minElem < 1 || maxElem >= numCols) {
+        string errorString ("Column index out of range.");
+        throw Exception (errorString);
+    }
+    
+    for (vector<size_t>::const_iterator colIt = scrambledColumnNums.begin(); colIt != scrambledColumnNums.end(); ++colIt) {
+        size_t colNum = *colIt - 1;
+        scrambledCols.insert(colNum);
+        /*
+        size_t colNum = *colIt; 
+        if (colNum == 0) {
+        if (*colIt - 1 >= numCols) {
+            string errorString ("Column #" + boost::lexical_cast <string> (*colIt) + " does not exist.");
+            throw Exception (errorString);
+        }
+        scrambledCols.insert(*colIt - 1);
+        */
+    }
+}
+
+    
+
+        
 
         
         
